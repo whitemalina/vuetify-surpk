@@ -2,23 +2,31 @@
   <v-dialog v-model="dialog" persistent max-width="600px">
     <template v-slot:activator="{ on, attrs }">
       <v-btn
-        fab
-        color="red"
-        bottom
-        left
         absolute
+        dark
+        fab
+        bottom
+        right
+        color="#ff6600"
         v-on="on"
         v-bind="attrs"
         @click="dialog = !dialog"
+        style="bottom: 15px !important; box-shadow: none !important"
       >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
     <v-card>
+      <v-form
+        ref="form"
+
+        lazy-validation
+      >
       <v-card-title>
         <span class="headline">Создание заявки</span>
       </v-card-title>
       <v-card-text>
+      
         <v-container>
           <v-row>
             <v-col cols="12" sm="6" md="4">
@@ -54,6 +62,7 @@
               <v-textarea
                 label="Проблема"
                 :rules="[v => !!v || 'Поле обязательно']"
+                v-model="problem"
                 counter
               ></v-textarea>
             </v-col>
@@ -61,13 +70,14 @@
               <v-select
                 :items="['СП-1', 'СП-2', 'СП-3', 'СП-4', 'СП-5']"
                 label="СП"
+                v-model="sp"
                 :rules="[v => !!v || 'Поле обязательно']"
                 required
               ></v-select>
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model="firstname"
+                v-model="cab"
                 label="Кабинет*"
                 :rules="nameRules"
                 required
@@ -82,7 +92,10 @@
         <v-btn color="blue darken-1" text @click="dialog = false">Закрыть</v-btn>
         <v-btn color="blue darken-1" text @click="validate">Отправить</v-btn>
       </v-card-actions>
+      
+      </v-form>
     </v-card>
+    
   </v-dialog>
 </template>
 
@@ -98,6 +111,10 @@ export default {
   data: () => ({
     firstname: '',
     lastname: '',
+    cab: '',
+    problem: '',
+    sp: '',
+
     drawer: true,
     dialog: false,
     items: ['СП-1', 'СП-2', 'СП-3', 'СП-4'],
@@ -110,7 +127,12 @@ export default {
   }),
   methods: {
     validate() {
-      this.$refs.form.validate()
+      if (this.$refs.form.validate()) {
+        this.dialog = !this.dialog
+        console.log(this)
+        this.$refs.form.reset()
+        this.$refs.form.resetValidation() 
+      }
     },
   }
 };

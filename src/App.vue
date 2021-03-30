@@ -25,23 +25,24 @@
             </v-list-item>
           </v-list>
         </v-navigation-drawer>
-
+       
         <v-app-bar
           app
           color="#23539c"
-          flat="true"
-          collapse-on-scroll="true"
+          flat
+          collapse-on-scroll
           dark
         >
           <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
           <v-toolbar-title>СПК ПОДДЕРЖКА</v-toolbar-title>
-          <ModalSend></ModalSend>
+          
         </v-app-bar>
 
         <v-main>
           <v-container
-            class="fill-height"
+            class="fill-height "
             fluid
+            style="position: relative"
           >
             <v-row
               align="center"
@@ -62,10 +63,15 @@
                     </v-btn>
                   </template>
                   <span>Source</span>
+                  
                 </v-tooltip>
+                
               </v-col>
+              
             </v-row>
+            <ModalSend></ModalSend>
           </v-container>
+          
         </v-main>
         <v-footer
           color="#23539c"
@@ -95,7 +101,7 @@ export default {
   data: () => ({
     firstname: '',
     lastname: '',
-    drawer: true,
+    drawer: false,
     dialog: false,
     items: ['СП-1', 'СП-2', 'СП-3', 'СП-4'],
   }),
