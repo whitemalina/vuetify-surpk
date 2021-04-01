@@ -2,7 +2,7 @@
   <v-dialog v-model="dialog" persistent max-width="600px">
     <template v-slot:activator="{ on, attrs }">
       <v-btn
-        absolute
+        fixed
         dark
         fab
         bottom
@@ -11,7 +11,7 @@
         v-on="on"
         v-bind="attrs"
         @click="dialog = !dialog"
-        style="bottom: 15px !important; box-shadow: none !important"
+        style="bottom: 50px !important; box-shadow: none !important"
       >
         <v-icon>mdi-plus</v-icon>
       </v-btn>
@@ -92,14 +92,15 @@
         <v-btn color="blue darken-1" text @click="dialog = false">Закрыть</v-btn>
         <v-btn color="blue darken-1" text @click="validate">Отправить</v-btn>
       </v-card-actions>
-      
       </v-form>
     </v-card>
-    
+
   </v-dialog>
 </template>
 
 <script>
+import dateFormat from "dateformat"
+import ItemList from "./ItemList";
 export default {
   name: "App",
   components: {
@@ -117,7 +118,7 @@ export default {
 
     drawer: true,
     dialog: false,
-    items: ['СП-1', 'СП-2', 'СП-3', 'СП-4'],
+    items: ['СП-1', 'СП-2', 'СП-3', 'СП-4', 'СП-5'],
     nameRules: [
       v => !!v || 'Имя обязательно',
     ],
@@ -126,12 +127,53 @@ export default {
     ],
   }),
   methods: {
-    validate() {
+    async validate() {
       if (this.$refs.form.validate()) {
         this.dialog = !this.dialog
-        console.log(this)
+
+        let data = {
+          date: dateFormat(new Date(),'isoDate'),
+          worker: this.firstname + ' ' +this.lastname,
+          cab: this.cab,
+          problem: this.problem,
+          sp: this.sp,
+        }
+        console.log(data)
+       let id =  await fetch("http://api-surpk.herokuapp.com/requests/",
+            {
+              method: "POST",
+              body: JSON.stringify(data),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(function (res) {
+              console.log(data)
+              return res.json();
+            })
+            .then(function (data) {
+              // console.log(data['insertId'])
+              const id =  data['insertId']
+              // console.log(id)
+              return id
+            })
+            .then(id => {
+              return id})
         this.$refs.form.reset()
-        this.$refs.form.resetValidation() 
+        this.$refs.form.resetValidation()
+        console.log(ItemList)
+
+        const newTodo = {
+          id: id,
+          worker: this.worker,
+          cab: this.cab,
+          problem: this.problem,
+          status: "1",
+          date: Date.now(),
+          sp: this.sp,
+        };
+        console.log(id);
+        ItemList.methods.addTodo(newTodo)
       }
     },
   }
