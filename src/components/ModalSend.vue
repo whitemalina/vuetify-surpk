@@ -17,165 +17,119 @@
       </v-btn>
     </template>
     <v-card>
-      <v-form
-        ref="form"
-
-        lazy-validation
-      >
-      <v-card-title>
-        <span class="headline">Создание заявки</span>
-      </v-card-title>
-      <v-card-text>
-      
-        <v-container>
-          <v-row>
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field
-                v-model="firstname"
-                label="Имя*"
-                :rules="nameRules"
-                required
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field
-                v-model="lastname"
-                :rules="lastNameRules"
-                label="Фамилия*"
-                hint=""
-                required
-              ></v-text-field>
-            </v-col>
-            <!--                      <v-col cols="12" sm="6" md="4">-->
-            <!--                        <v-text-field-->
-            <!--                          label="Legal last name*"-->
-            <!--                          hint="example of persistent helper text"-->
-            <!--                          persistent-hint-->
-            <!--                          required-->
-            <!--                        ></v-text-field>-->
-            <!--                      </v-col>-->
-            <v-col cols="12">
-
-            </v-col>
-            <v-col cols="12">
-              <!--                        <v-text-field label="Password*" type="password" required></v-text-field>-->
-              <v-textarea
-                label="Проблема"
-                :rules="[v => !!v || 'Поле обязательно']"
-                v-model="problem"
-                counter
-              ></v-textarea>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-select
-                :items="['СП-1', 'СП-2', 'СП-3', 'СП-4', 'СП-5']"
-                label="СП"
-                v-model="sp"
-                :rules="[v => !!v || 'Поле обязательно']"
-                required
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="cab"
-                label="Кабинет*"
-                :rules="nameRules"
-                required
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-container>
-        <small>*Обязательные поля</small>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="dialog = false">Закрыть</v-btn>
-        <v-btn color="blue darken-1" text @click="validate">Отправить</v-btn>
-      </v-card-actions>
+      <v-form ref="form" lazy-validation>
+        <v-card-title>
+          <span class="headline">Создание заявки</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  v-model="newForm.firstname"
+                  label="Имя*"
+                  :rules="nameRules"
+                  required
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="4">
+                <v-text-field
+                  v-model="newForm.lastname"
+                  :rules="lastNameRules"
+                  label="Фамилия*"
+                  hint=""
+                  required
+                ></v-text-field>
+              </v-col>
+              <!--                      <v-col cols="12" sm="6" md="4">-->
+              <!--                        <v-text-field-->
+              <!--                          label="Legal last name*"-->
+              <!--                          hint="example of persistent helper text"-->
+              <!--                          persistent-hint-->
+              <!--                          required-->
+              <!--                        ></v-text-field>-->
+              <!--                      </v-col>-->
+              <v-col cols="12"> </v-col>
+              <v-col cols="12">
+                <!--                        <v-text-field label="Password*" type="password" required></v-text-field>-->
+                <v-textarea
+                  label="Проблема"
+                  :rules="[(v) => !!v || 'Поле обязательно']"
+                  v-model="newForm.problem"
+                  counter
+                ></v-textarea>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-select
+                  :items="['СП-1', 'СП-2', 'СП-3', 'СП-4', 'СП-5']"
+                  label="СП"
+                  v-model="newForm.sp"
+                  :rules="[(v) => !!v || 'Поле обязательно']"
+                  required
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="newForm.cab"
+                  label="Кабинет*"
+                  :rules="nameRules"
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+          <small>*Обязательные поля</small>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="dialog = false"
+            >Закрыть</v-btn
+          >
+          <v-btn color="blue darken-1" text @click="validate">Отправить</v-btn>
+        </v-card-actions>
       </v-form>
     </v-card>
-
   </v-dialog>
 </template>
 
 <script>
-import dateFormat from "dateformat"
-import ItemList from "./ItemList";
+import { bus } from "../bus";
 export default {
   name: "App",
-  components: {
-
-  },
+  components: {},
   props: {
     source: String,
   },
   data: () => ({
-    firstname: '',
-    lastname: '',
-    cab: '',
-    problem: '',
-    sp: '',
+    newForm: {
+      firstname: "",
+      lastname: "",
+      cab: "",
+      problem: "",
+      sp: "",
+    },
 
     drawer: true,
     dialog: false,
-    items: ['СП-1', 'СП-2', 'СП-3', 'СП-4', 'СП-5'],
-    nameRules: [
-      v => !!v || 'Имя обязательно',
-    ],
-    lastNameRules: [
-      v => !!v || 'Фамилия обязательна',
-    ],
+    items: ["СП-1", "СП-2", "СП-3", "СП-4", "СП-5"],
+    nameRules: [(v) => !!v || "Имя обязательно"],
+    lastNameRules: [(v) => !!v || "Фамилия обязательна"],
   }),
+
   methods: {
     async validate() {
       if (this.$refs.form.validate()) {
-        this.dialog = !this.dialog
-
+        this.dialog = !this.dialog;
         let data = {
-          date: dateFormat(new Date(),'isoDate'),
-          worker: this.firstname + ' ' +this.lastname,
-          cab: this.cab,
-          problem: this.problem,
-          sp: this.sp,
-        }
-        console.log(data)
-       let id =  await fetch("http://api-surpk.herokuapp.com/requests/",
-            {
-              method: "POST",
-              body: JSON.stringify(data),
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            })
-            .then(function (res) {
-              console.log(data)
-              return res.json();
-            })
-            .then(function (data) {
-              // console.log(data['insertId'])
-              const id =  data['insertId']
-              // console.log(id)
-              return id
-            })
-            .then(id => {
-              return id})
-        this.$refs.form.reset()
-        this.$refs.form.resetValidation()
-        console.log(ItemList)
-
-        const newTodo = {
-          id: id,
-          worker: this.worker,
-          cab: this.cab,
-          problem: this.problem,
-          status: "1",
-          date: Date.now(),
-          sp: this.sp,
+          sp: this.newForm.sp,
+          cab: this.newForm.cab,
+          text: this.newForm.problem,
         };
-        console.log(id);
-        ItemList.methods.addTodo(newTodo)
+        console.log("modal");
+        bus.$emit("create-Todo", data);
+        // bus.$emit("create-Todo", data);
       }
     },
-  }
+  },
 };
 </script>
