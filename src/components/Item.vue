@@ -1,28 +1,54 @@
 <template>
   <v-expansion-panel class="my-0">
     <v-expansion-panel-header disable-icon-rotate>
-      <v-row>
-        <v-col class="col-12 col-lg-3">
+      <v-row align="center">
+        <v-col class="col-12 col-lg-2">
           {{ dateupdate(todo.date) }}
         </v-col>
-        <v-col class="col-12 col-lg-4">
-          {{ todo.sp }}<span class="text--secondary ml-1">{{ todo.cab }}</span>
+        <v-col class="col-12 col-lg-2 text-center">
+          {{ todo.sp }} <br />
+          <span class="text--secondary">{{ todo.cab }}</span>
         </v-col>
-        <v-col class="d-flex justify-lg-center justify-start col-12 col-lg-5">
+        <v-col class="col-12 col-lg-4 text-center text-overflow">
+          {{ todo.text }}
+        </v-col>
+        <v-col class="text-center col-12 col-lg-3">
           {{ todo.user }}
+          <br />
+          <span class="caption">{{ todo.master }}</span>
         </v-col>
       </v-row>
       <template v-slot:actions>
-        <v-progress-circular
-          :size="22"
-          :width="2"
-          v-if="todo.status == 2"
-          color="primary"
-          indeterminate
-        ></v-progress-circular>
-        <v-icon color="teal" size="22" v-if="todo.status == 3">
-          mdi-check
-        </v-icon>
+        <v-tooltip bottom v-if="todo.status == 2">
+          <template v-slot:activator="{ on, attrs }">
+            <v-progress-circular
+              v-bind="attrs"
+              v-on="on"
+              :size="22"
+              :width="2"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
+          </template>
+          <span>Выполняется</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="todo.status == 3">
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon color="teal" size="22" v-bind="attrs" v-on="on">
+              mdi-check
+            </v-icon>
+          </template>
+          <span>Выполнена</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="todo.status == 1">
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon color="teal" size="22" v-bind="attrs" v-on="on">
+              mdi-clock-outline
+            </v-icon>
+          </template>
+          <span>Ожидание</span>
+        </v-tooltip>
+
         <v-icon color="gray" size="22" v-if="todo.status == 1">
           mdi-clock-outline
         </v-icon>
@@ -39,6 +65,7 @@
           width="150"
           class="ma-2 mr-auto"
           color="red"
+          v-if="IsMaster !== 1"
           dark
           @click.prevent="$emit('del-todo', [todo.id, count])"
         >
@@ -49,7 +76,7 @@
           height="35"
           class="ma-2 ml-auto"
           width="150"
-          v-if="todo.status == 2 && IsAdmin == 1"
+          v-if="todo.status == 2 && IsMaster == 1"
           color="green"
           dark
           @click.prevent="$emit('finish-todo', [todo.id, count])"
@@ -60,7 +87,7 @@
         <v-btn
           height="35"
           width="150"
-          v-if="todo.status == 1 && IsAdmin == 1"
+          v-if="todo.status == 1 && IsMaster == 1"
           class="ma-2 ml-auto"
           color="#23539c"
           dark
@@ -81,6 +108,8 @@ export default {
   data: function () {
     return {
       IsAdmin: 0,
+      IsMaster: 0,
+      menu: false,
     };
   },
   props: {
@@ -101,7 +130,9 @@ export default {
     UserIsAdmin() {
       let user = JSON.parse(localStorage.getItem("user"));
       this.IsAdmin = user.IsAdmin;
+      this.IsMaster = user.IsMaster;
     },
+
     dateupdate(todo) {
       // var dateFormat = require("dateformat");
       return (
@@ -115,3 +146,14 @@ export default {
   },
 };
 </script>
+<style lang="css">
+.text-overflow {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 50px;
+  overflow: hidden;
+}
+.height {
+  max-height: 15px;
+}
+</style>

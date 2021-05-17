@@ -1,5 +1,5 @@
 <template v-slot:extension>
-  <v-dialog v-model="dialog" persistent max-width="600px">
+  <v-dialog v-model="dialog" scrollable max-width="600px">
     <template v-slot:activator="{ on, attrs }">
       <v-btn
         fixed
@@ -9,6 +9,7 @@
         right
         color="#ff6600"
         v-on="on"
+        v-if="IsMaster !== 1"
         v-bind="attrs"
         @click="dialog = !dialog"
         style="bottom: 50px !important; box-shadow: none !important"
@@ -55,23 +56,38 @@
                 <v-text-field
                   v-model="newForm.cab"
                   label="Кабинет*"
-                  type="number"
                   aria-valuemax="5"
-                  :rules="nameRules"
+                  :rules="[(v) => !!v || 'Поле обязательно']"
                   required
                 ></v-text-field>
               </v-col>
             </v-row>
           </v-container>
           <small>*Обязательные поля</small>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue darken-1"
+              :disabled="btns.ModalSendEsc"
+              text
+              @click.prevent="
+                () => {
+                  dialog = false;
+                  $refs.form.reset();
+                }
+              "
+              >Закрыть</v-btn
+            >
+            <v-btn
+              color="blue darken-1"
+              text
+              :loading="loaders.loader"
+              type="submit"
+              @click.prevent="validate()"
+              >Отправить</v-btn
+            >
+          </v-card-actions>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false"
-            >Закрыть</v-btn
-          >
-          <v-btn color="blue darken-1" text @click="validate">Отправить</v-btn>
-        </v-card-actions>
       </v-form>
     </v-card>
   </v-dialog>
@@ -86,6 +102,14 @@ export default {
     source: String,
   },
   data: () => ({
+    loaders: {
+      loader: null,
+    },
+    btns: {
+      ModalSend: null,
+    },
+    IsAdmin: 0,
+    IsMaster: 0,
     newForm: {
       firstname: "",
       lastname: "",
@@ -97,27 +121,28 @@ export default {
     drawer: true,
     dialog: false,
     items: ["СП-1", "СП-2", "СП-3", "СП-4", "СП-5"],
-    nameRules: [
-      (v) => {
-        if (v >= 60 || v < 0) {
-          return "Число должно быть меньше 60 и больше 0";
-        }
-      },
-    ],
-    lastNameRules: [(v) => !!v || "Фамилия обязательна"],
   }),
-
+  mounted() {
+    this.UserIsAdmin();
+  },
   methods: {
+    UserIsAdmin() {
+      let user = JSON.parse(localStorage.getItem("user"));
+      this.IsAdmin = user.IsAdmin;
+      this.IsMaster = user.IsMaster;
+    },
     async validate() {
       if (this.$refs.form.validate()) {
+        this.loaders.loader = !this.loaders.loader;
         this.dialog = !this.dialog;
         let data = {
           sp: this.newForm.sp,
           cab: this.newForm.cab,
-          text: this.newForm.problem,
+          text: this.newForm.problem.trim(),
         };
-        console.log("modal");
         bus.$emit("create-Todo", data);
+        this.$refs.form.reset();
+        this.loaders.loader = !this.loaders.loader;
       }
     },
   },

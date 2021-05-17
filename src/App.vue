@@ -27,11 +27,11 @@
           <!--          <v-app-bar-nav-icon-->
           <!--            @click.stop="drawer = !drawer"-->
           <!--          ></v-app-bar-nav-icon>-->
-          <v-toolbar-title>СПК ПОДДЕРЖКА</v-toolbar-title>
+          <v-toolbar-title class="mr-auto">СПК ПОДДЕРЖКА</v-toolbar-title>
 
-          <v-dialog v-model="profile" persistent max-width="600px">
+          <v-dialog v-model="profile" scrollable max-width="600px">
             <template v-slot:activator="{ on, attrs }">
-              <span class="ml-auto" v-if="user == null"
+              <span class="ml-auto d-flex align-center" v-if="user == null"
                 ><v-icon
                   v-bind="attrs"
                   v-on="on"
@@ -43,7 +43,7 @@
                   mdi-account-circle
                 </v-icon></span
               >
-              <span class="ml-auto" v-else>
+              <span class="ml-auto d-flex align-center" v-else>
                 <v-icon class="mr-1" @click.prevent="logout()" size="30" right>
                   mdi-exit-to-app
                 </v-icon>
@@ -76,18 +76,34 @@
                         ></v-text-field>
                       </v-col>
                     </v-row>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        color="blue darken-1"
+                        text
+                        :disabled="btns.LoginEsc"
+                        @click.prevent="
+                          () => {
+                            profile = false;
+                            $refs.loginForm.reset();
+                          }
+                        "
+                      >
+                        Отмена
+                      </v-btn>
+                      <v-btn
+                        color="blue darken-1"
+                        type="submit"
+                        :loading="loaders.LoginLoader"
+                        text
+                        @click.prevent="auth()"
+                      >
+                        Вход
+                      </v-btn>
+                    </v-card-actions>
                   </v-form>
                 </v-container>
               </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="profile = false">
-                  Отмена
-                </v-btn>
-                <v-btn color="blue darken-1" text @click.prevent="auth()">
-                  Вход
-                </v-btn>
-              </v-card-actions>
             </v-card>
           </v-dialog>
         </v-app-bar>
@@ -112,41 +128,7 @@
             class="py-2"
           >
             <v-row>
-              <v-col class="mx-auto col-12 col-md-10 col-xl-6 col-lg-8">
-                <v-expansion-panels accordion flat readonly>
-                  <v-expansion-panel
-                    class="my-0"
-                    style="cursor: default !important"
-                  >
-                    <v-expansion-panel-header
-                      disable-icon-rotate
-                      style="
-                        cursor: default !important;
-                        border: 1px solid #23539c;
-                      "
-                    >
-                      <v-row>
-                        <v-col class="col-12 col-lg-3 spkcolor"> ДАТА</v-col>
-                        <v-col class="col-12 col-lg-4 spkcolor">
-                          СП<span class="spkcolor-secondary ml-1">КАБ</span>
-                        </v-col>
-                        <v-col
-                          class="d-flex spkcolor justify-lg-center justify-start col-12 col-lg-5"
-                          style="letter-spacing: 1.6666667px"
-                        >
-                          ФИО
-                        </v-col>
-                      </v-row>
-                      <template v-slot:actions>
-                        <v-icon color="#23539c">
-                          mdi-information-outline
-                        </v-icon>
-                      </template>
-                    </v-expansion-panel-header>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-                <ItemList @alert="alert"></ItemList>
-              </v-col>
+              <ItemList @alert="alert"></ItemList>
             </v-row>
           </v-container>
           <div class="alerts">
@@ -220,6 +202,8 @@ export default {
 
     async auth() {
       if (this.$refs.loginForm.validate()) {
+        this.loaders.LoginLoader = !this.loaders.LoginLoader;
+        this.btns.LoginEsc = !this.btns.LoginEsc;
         let data = {
           login: this.loginForm.login,
           password: this.loginForm.password,
@@ -257,6 +241,8 @@ export default {
 
         this.$refs.loginForm.reset();
         this.$refs.loginForm.resetValidation();
+        this.loaders.LoginLoader = !this.loaders.LoginLoader;
+        this.btns.LoginEsc = !this.btns.LoginEsc;
       }
     },
   },
@@ -281,6 +267,13 @@ export default {
         password: "",
         loginRules: [(v) => !!v || "Логин обязателен"],
         passRules: [(v) => !!v || "Пароль обязателен"],
+      },
+      search: "",
+      btns: {
+        LoginEsc: null,
+      },
+      loaders: {
+        LoginLoader: null,
       },
       alerts: [],
       user: null,

@@ -1,18 +1,74 @@
 <template>
-  <v-expansion-panels accordion focusable class="mt-3">
-    <transition-group class="w-100" name="fade"
-      ><item
-        @del-todo="delTodo"
-        @start-todo="startTodo"
-        @finish-todo="finishTodo"
-        class="w-100"
-        v-for="(todo, index) in todos"
-        v-bind:todo="todo"
-        v-bind:count="index"
-        v-bind:key="todo.id"
-      ></item
-    ></transition-group>
-  </v-expansion-panels>
+  <v-col class="mx-auto col-12 col-md-10 col-xl-6 col-lg-8">
+    <v-expansion-panels accordion flat readonly>
+      <v-expansion-panel class="my-0" style="cursor: default !important">
+        <v-expansion-panel-header
+          disable-icon-rotate
+          style="cursor: default !important; border: 1px solid #23539c"
+        >
+          <v-row align="center">
+            <v-col class="col-12 col-lg-2 spkcolor"> ДАТА</v-col>
+            <v-col class="col-12 col-lg-2 spkcolor text-center">
+              СП <br />
+              <span class="spkcolor-secondary ml-1">КАБИНЕТ</span>
+            </v-col>
+            <v-col class="col-12 col-lg-4 spkcolor text-center">
+              ПРОБЛЕМА
+            </v-col>
+
+            <v-col
+              class="d-flex spkcolor justify-lg-center justify-start col-12 col-lg-3"
+              style="letter-spacing: 1.6666667px"
+            >
+              ФИО
+            </v-col>
+          </v-row>
+          <template v-slot:actions>
+            <v-menu
+              v-model="menu"
+              :close-on-content-click="false"
+              :nudge-width="200"
+              offset-x
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on" width="22" height="22">
+                  <v-icon color="#23539c" size="22">mdi-magnify</v-icon>
+                </v-btn>
+              </template>
+
+              <v-card>
+                <v-card-actions>
+                  <!--                  <v-form class="d-flex align-center">-->
+                  <v-text-field
+                    v-model="search"
+                    class="mx-3 my-0"
+                    append-icon="mdi-magnify"
+                    single-line
+                  ></v-text-field>
+                  <!--                  </v-form>-->
+                </v-card-actions>
+              </v-card>
+            </v-menu>
+          </template>
+        </v-expansion-panel-header>
+      </v-expansion-panel>
+    </v-expansion-panels>
+
+    <v-expansion-panels focusable class="mt-3">
+      <transition-group class="w-100" name="fade"
+        ><item
+          @del-todo="delTodo"
+          @start-todo="startTodo"
+          @finish-todo="finishTodo"
+          class="w-100"
+          v-for="(todo, index) in searching"
+          v-bind:todo="todo"
+          v-bind:count="index"
+          v-bind:key="todo.id"
+        ></item
+      ></transition-group>
+    </v-expansion-panels>
+  </v-col>
 </template>
 
 <script>
@@ -22,6 +78,25 @@ export default {
   name: "App",
   components: {
     Item,
+  },
+  computed: {
+    searching() {
+      if (!this.search) return this.todos;
+
+      const search = this.search.toLowerCase();
+
+      return this.todos.filter((todo) => {
+        const text = (
+          todo.sp +
+          todo.cab +
+          todo.user +
+          todo.text +
+          todo.master
+        ).toLowerCase();
+
+        return text.indexOf(search) > -1;
+      });
+    },
   },
   props: {
     source: String,
@@ -44,6 +119,7 @@ export default {
       items: ["СП-1", "СП-2", "СП-3", "СП-4"],
       todos: [],
       token: null,
+      search: "",
     };
   },
 
