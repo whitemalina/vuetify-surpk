@@ -32,12 +32,24 @@
       <span class="d-block pt-4">
         {{ todo.text }}
       </span>
+
       <v-row class="mt-3">
+        <v-btn
+          height="35"
+          width="150"
+          class="ma-2 mr-auto"
+          color="red"
+          dark
+          @click.prevent="$emit('del-todo', [todo.id, count])"
+        >
+          удалить
+          <v-icon dark right> mdi-delete </v-icon>
+        </v-btn>
         <v-btn
           height="35"
           class="ma-2 ml-auto"
           width="150"
-          v-if="todo.status == 2"
+          v-if="todo.status == 2 && IsAdmin == 1"
           color="green"
           dark
           @click.prevent="$emit('finish-todo', [todo.id, count])"
@@ -48,7 +60,7 @@
         <v-btn
           height="35"
           width="150"
-          v-if="todo.status == 1"
+          v-if="todo.status == 1 && IsAdmin == 1"
           class="ma-2 ml-auto"
           color="#23539c"
           dark
@@ -56,18 +68,6 @@
         >
           Принять
           <v-icon dark right> mdi-text-box-check </v-icon>
-        </v-btn>
-        <v-btn
-          height="35"
-          v-if="todo.status == 3"
-          width="150"
-          class="ma-2 ml-auto"
-          color="red"
-          dark
-          @click.prevent="$emit('del-todo', [todo.id, count])"
-        >
-          удалить
-          <v-icon dark right> mdi-delete </v-icon>
         </v-btn>
       </v-row>
     </v-expansion-panel-content>
@@ -78,6 +78,11 @@
 import dateFormat from "dateformat";
 export default {
   name: "App",
+  data: function () {
+    return {
+      IsAdmin: 0,
+    };
+  },
   props: {
     todo: {
       date: "",
@@ -89,7 +94,14 @@ export default {
     },
     count: null,
   },
+  mounted() {
+    this.UserIsAdmin();
+  },
   methods: {
+    UserIsAdmin() {
+      let user = JSON.parse(localStorage.getItem("user"));
+      this.IsAdmin = user.IsAdmin;
+    },
     dateupdate(todo) {
       // var dateFormat = require("dateformat");
       return (

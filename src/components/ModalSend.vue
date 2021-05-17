@@ -24,23 +24,6 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field
-                  v-model="newForm.firstname"
-                  label="Имя*"
-                  :rules="nameRules"
-                  required
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-text-field
-                  v-model="newForm.lastname"
-                  :rules="lastNameRules"
-                  label="Фамилия*"
-                  hint=""
-                  required
-                ></v-text-field>
-              </v-col>
               <!--                      <v-col cols="12" sm="6" md="4">-->
               <!--                        <v-text-field-->
               <!--                          label="Legal last name*"-->
@@ -72,6 +55,8 @@
                 <v-text-field
                   v-model="newForm.cab"
                   label="Кабинет*"
+                  type="number"
+                  aria-valuemax="5"
                   :rules="nameRules"
                   required
                 ></v-text-field>
@@ -112,7 +97,13 @@ export default {
     drawer: true,
     dialog: false,
     items: ["СП-1", "СП-2", "СП-3", "СП-4", "СП-5"],
-    nameRules: [(v) => !!v || "Имя обязательно"],
+    nameRules: [
+      (v) => {
+        if (v >= 60 || v < 0) {
+          return "Число должно быть меньше 60 и больше 0";
+        }
+      },
+    ],
     lastNameRules: [(v) => !!v || "Фамилия обязательна"],
   }),
 
@@ -127,7 +118,6 @@ export default {
         };
         console.log("modal");
         bus.$emit("create-Todo", data);
-        // bus.$emit("create-Todo", data);
       }
     },
   },

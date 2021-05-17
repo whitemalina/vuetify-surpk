@@ -2,31 +2,31 @@
   <div id="app">
     <v-app id="inspire">
       <v-app id="inspire">
-        <v-navigation-drawer v-model="drawer" app>
-          <v-list dense>
-            <v-list-item link>
-              <v-list-item-action>
-                <v-icon>mdi-home</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Создание заявки</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item link>
-              <v-list-item-action>
-                <v-icon>mdi-email</v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Обратная связь</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-navigation-drawer>
+        <!--        <v-navigation-drawer v-model="drawer" app>-->
+        <!--          <v-list dense>-->
+        <!--            <v-list-item link>-->
+        <!--              <v-list-item-action>-->
+        <!--                <v-icon>mdi-home</v-icon>-->
+        <!--              </v-list-item-action>-->
+        <!--              <v-list-item-content>-->
+        <!--                <v-list-item-title>Создание заявки</v-list-item-title>-->
+        <!--              </v-list-item-content>-->
+        <!--            </v-list-item>-->
+        <!--            <v-list-item link>-->
+        <!--              <v-list-item-action>-->
+        <!--                <v-icon>mdi-email</v-icon>-->
+        <!--              </v-list-item-action>-->
+        <!--              <v-list-item-content>-->
+        <!--                <v-list-item-title>Обратная связь</v-list-item-title>-->
+        <!--              </v-list-item-content>-->
+        <!--            </v-list-item>-->
+        <!--          </v-list>-->
+        <!--        </v-navigation-drawer>-->
 
         <v-app-bar app color="#23539c" flat hide-on-scroll dark>
-          <v-app-bar-nav-icon
-            @click.stop="drawer = !drawer"
-          ></v-app-bar-nav-icon>
+          <!--          <v-app-bar-nav-icon-->
+          <!--            @click.stop="drawer = !drawer"-->
+          <!--          ></v-app-bar-nav-icon>-->
           <v-toolbar-title>СПК ПОДДЕРЖКА</v-toolbar-title>
 
           <v-dialog v-model="profile" persistent max-width="600px">
@@ -43,11 +43,12 @@
                   mdi-account-circle
                 </v-icon></span
               >
-              <span class="ml-auto" v-else
-                ><v-icon class="mr-1" @click.prevent="logout()" size="30" right>
-                  mdi-exit-to-app </v-icon
-                >{{ user.username }}</span
-              >
+              <span class="ml-auto" v-else>
+                <v-icon class="mr-1" @click.prevent="logout()" size="30" right>
+                  mdi-exit-to-app
+                </v-icon>
+                <span class="d-none d-sm-inline">{{ user.username }}</span>
+              </span>
             </template>
             <v-card>
               <v-card-title>
@@ -92,7 +93,24 @@
         </v-app-bar>
 
         <v-main>
-          <v-container fluid style="position: relative" class="py-2">
+          <v-container class="container-f" v-if="user == null">
+            <span class="overline">ВЫ НЕ АВТОРИЗОВАНЫ</span>
+            <v-btn
+              width="175px"
+              class="mt-3"
+              depressed
+              color="primary"
+              @click.prevent="profile = !profile"
+            >
+              ВОЙТИ
+            </v-btn>
+          </v-container>
+          <v-container
+            v-if="user !== null"
+            fluid
+            style="position: relative"
+            class="py-2"
+          >
             <v-row>
               <v-col class="mx-auto col-12 col-md-10 col-xl-6 col-lg-8">
                 <v-expansion-panels accordion flat readonly>
@@ -143,7 +161,7 @@
               </v-alert>
             </transition-group>
           </div>
-          <modal-send></modal-send>
+          <modal-send v-if="user !== null"></modal-send>
         </v-main>
         <v-footer color="#23539c" app>
           <span class="white--text copyc"
@@ -159,6 +177,7 @@
 <script>
 import ModalSend from "./components/ModalSend";
 import ItemList from "./components/ItemList";
+import { bus } from "@/bus";
 
 export default {
   name: "App",
@@ -171,6 +190,9 @@ export default {
     source: String,
   },
   methods: {
+    getPosts() {
+      bus.$emit("getAllPosts");
+    },
     token() {
       return this.user.token;
     },
@@ -221,13 +243,13 @@ export default {
           .then((data) => {
             if (result == 1) {
               this.user = data;
-
               this.saveLocalData();
             }
           });
         if (result == 1) {
           this.changeProfile();
           this.alert("Вы успешно вошли", "success");
+          this.getPosts();
         } else {
           this.changeProfile();
           this.alert("Что-то пошло не так", "error");
@@ -268,6 +290,13 @@ export default {
 </script>
 
 <style lang="css">
+.container-f {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  flex-direction: column;
+}
 .copyc a {
   color: white !important;
 }

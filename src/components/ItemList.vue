@@ -27,19 +27,13 @@ export default {
     source: String,
   },
   mounted() {
-    console.log(123123);
+    bus.$on("getAllPosts", () => {
+      this.getPosts();
+    });
     bus.$on("create-Todo", (data) => {
       this.createTodo(data);
     });
-    fetch("http://surpk-api-last.herokuapp.com/public/api/post")
-      .then((response) => response.json())
-      .then((json) => {
-        setTimeout(() => {
-          this.todos = json;
-          console.log(json);
-          this.loading = true;
-        }, 1000);
-      });
+    this.getPosts();
   },
   data: function () {
     return {
@@ -54,6 +48,24 @@ export default {
   },
 
   methods: {
+    getPosts() {
+      if (this.getToken() !== null) {
+        fetch("http://surpk-api-last.herokuapp.com/public/api/post", {
+          headers: {
+            Authorization: `Bearer ${this.getToken()}`,
+          },
+        })
+          .then((response) => response.json())
+          .then((json) => {
+            setTimeout(() => {
+              this.todos = json;
+              this.loading = true;
+            }, 1000);
+          });
+      } else {
+        this.alert("Вы не авторизованы!", "error");
+      }
+    },
     delTodo(id) {
       console.log(id);
       fetch(`http://surpk-api-last.herokuapp.com/public/api/post/${id[0]}`, {
@@ -165,7 +177,9 @@ export default {
     getToken() {
       if (this.token == null) {
         let user = JSON.parse(localStorage.getItem("user"));
-        this.token = user.token;
+        if (user !== null) {
+          this.token = user.token;
+        }
       }
       return this.token;
     },
