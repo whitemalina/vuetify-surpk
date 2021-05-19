@@ -205,8 +205,8 @@ export default {
         this.loaders.LoginLoader = !this.loaders.LoginLoader;
         this.btns.LoginEsc = !this.btns.LoginEsc;
         let data = {
-          login: this.loginForm.login,
-          password: this.loginForm.password,
+          login: this.loginForm.login.trim(),
+          password: this.loginForm.password.trim(),
         };
         let result;
         await fetch("http://surpk-api-last.herokuapp.com/public/api/login", {

@@ -88,9 +88,13 @@ export default {
       return this.todos.filter((todo) => {
         const text = (
           todo.sp +
+          " " +
           todo.cab +
+          " " +
           todo.user +
+          " " +
           todo.text +
+          " " +
           todo.master
         ).toLowerCase();
 

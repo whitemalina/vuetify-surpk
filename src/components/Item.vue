@@ -19,7 +19,7 @@
         </v-col>
       </v-row>
       <template v-slot:actions>
-        <v-tooltip bottom v-if="todo.status == 2">
+        <v-tooltip key="2" bottom v-if="todo.status == 2">
           <template v-slot:activator="{ on, attrs }">
             <v-progress-circular
               v-bind="attrs"
@@ -32,7 +32,7 @@
           </template>
           <span>Выполняется</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="todo.status == 3">
+        <v-tooltip key="1" bottom v-if="todo.status == 3">
           <template v-slot:activator="{ on, attrs }">
             <v-icon color="teal" size="22" v-bind="attrs" v-on="on">
               mdi-check
@@ -40,18 +40,14 @@
           </template>
           <span>Выполнена</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="todo.status == 1">
+        <v-tooltip key="3" bottom v-if="todo.status == 1">
           <template v-slot:activator="{ on, attrs }">
-            <v-icon color="teal" size="22" v-bind="attrs" v-on="on">
+            <v-icon color="gray" size="22" v-bind="attrs" v-on="on">
               mdi-clock-outline
             </v-icon>
           </template>
           <span>Ожидание</span>
         </v-tooltip>
-
-        <v-icon color="gray" size="22" v-if="todo.status == 1">
-          mdi-clock-outline
-        </v-icon>
       </template>
     </v-expansion-panel-header>
     <v-expansion-panel-content>
