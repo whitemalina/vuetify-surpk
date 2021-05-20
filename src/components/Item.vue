@@ -3,7 +3,7 @@
     <v-expansion-panel-header disable-icon-rotate>
       <v-row align="center">
         <v-col class="col-12 col-lg-2">
-          {{ dateupdate(todo.date) }}
+          {{ dateupdate(todo.created_at) }}
         </v-col>
         <v-col class="col-12 col-lg-2 text-center">
           {{ todo.sp }} <br />

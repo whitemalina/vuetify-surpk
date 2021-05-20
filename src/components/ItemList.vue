@@ -7,29 +7,43 @@
           style="cursor: default !important; border: 1px solid #23539c"
         >
           <v-row align="center">
-            <v-col class="col-12 col-lg-2 spkcolor"> ДАТА</v-col>
-            <v-col class="col-12 col-lg-2 spkcolor text-center">
-              СП <br />
-              <span class="spkcolor-secondary ml-1">КАБИНЕТ</span>
+            <v-col
+              class="col-12 col-lg-2 spkcolor pointer"
+              @click.prevent="todosBy('date')"
+              >ДАТА
+              <span v-if="sorting === 'date'">
+                {{ this.sortValue.date ? "▲" : "▼" }}</span
+              ></v-col
+            >
+            <v-col
+              class="col-12 col-lg-2 spkcolor text-center pointer"
+              @click.prevent="todosBy('sp')"
+            >
+              СП
+              <span v-if="sorting === 'sp'">
+                {{ this.sortValue.sp ? "▲" : "▼" }}</span
+              >
+              <br />
+              <span class="spkcolor-secondary ml-1">КАБИНЕТ </span>
             </v-col>
-            <v-col class="col-12 col-lg-4 spkcolor text-center">
+            <v-col class="text-center col-12 col-lg-4 spkcolor text-center">
               ПРОБЛЕМА
             </v-col>
 
             <v-col
-              class="d-flex spkcolor justify-lg-center justify-start col-12 col-lg-3"
+              class="spkcolor text-center justify-lg-center justify-start col-12 col-lg-3 pointer"
               style="letter-spacing: 1.6666667px"
+              @click.prevent="todosBy('master')"
             >
-              ФИО
+              ФИО<br />
+              <span class="spkcolor-secondary ml-1 master">МАСТЕР </span
+              ><span v-if="sorting === 'master'">
+                {{ this.sortValue.master ? "▲" : "▼" }}</span
+              >
             </v-col>
           </v-row>
           <template v-slot:actions>
-            <v-menu
-              v-model="menu"
-              :close-on-content-click="false"
-              :nudge-width="200"
-              offset-x
-            >
+            <v-menu :close-on-content-click="false" :nudge-width="200" offset-x>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on" width="22" height="22">
                   <v-icon color="#23539c" size="22">mdi-magnify</v-icon>
@@ -124,10 +138,75 @@ export default {
       todos: [],
       token: null,
       search: "",
+      sorting: "",
+      sortValue: {
+        date: true,
+        sp: true,
+        master: true,
+      },
     };
   },
 
   methods: {
+    todosBy(sorting) {
+      this.sorting = sorting;
+      switch (this.sorting) {
+        case "date":
+          return this.sortByDate();
+        case "sp":
+          return this.sortBySp();
+        case "master":
+          return this.sortByMaster();
+      }
+    },
+    sortBySp() {
+      this.sortValue.sp = !this.sortValue.sp;
+      if (this.sortValue.sp) {
+        this.searching.sort((a, b) => {
+          return a.sp.toLowerCase() > b.sp.toLowerCase() ? 1 : -1;
+        });
+      } else {
+        this.searching.sort((a, b) => {
+          return a.sp.toLowerCase() > b.sp.toLowerCase() ? -1 : 1;
+        });
+      }
+    },
+    sortByMaster() {
+      this.sortValue.master = !this.sortValue.master;
+      if (this.sortValue.master) {
+        this.searching.sort((a, b) => {
+          if (typeof a.master === "undefined") {
+            a.master = " ";
+          }
+          if (typeof b.master === "undefined") {
+            b.master = " ";
+          }
+          return a.master.toLowerCase() > b.master.toLowerCase() ? 1 : -1;
+        });
+      } else {
+        this.searching.sort((a, b) => {
+          if (typeof a.master === "undefined") {
+            a.master = " ";
+          }
+          if (typeof b.master === "undefined") {
+            b.master = " ";
+          }
+          return a.master.toLowerCase() > b.master.toLowerCase() ? -1 : 1;
+        });
+      }
+    },
+    sortByDate() {
+      this.sortValue.date = !this.sortValue.date;
+      if (this.sortValue.date) {
+        this.searching.sort(
+          (a, b) => new Date(a.created_at) - new Date(b.created_at)
+        );
+      } else {
+        this.searching.sort(
+          (a, b) => new Date(a.created_at) * -1 - new Date(b.created_at) * -1
+        );
+      }
+    },
     getPosts() {
       if (this.getToken() !== null) {
         fetch("http://surpk-api-last.herokuapp.com/public/api/post", {
@@ -180,6 +259,7 @@ export default {
         if (response.status == 202) {
           this.alert("Заявка принята", "success");
           this.todos[id[1]].status = 2;
+          this.todos[id[1]].master = this.getUsername();
         } else {
           if (response.status == 401) {
             this.alert("Ошибка аутентификации", "error");
@@ -304,5 +384,8 @@ export default {
 }
 .w-100 {
   width: 100%;
+}
+.pointer {
+  cursor: pointer;
 }
 </style>
