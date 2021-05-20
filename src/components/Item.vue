@@ -2,8 +2,9 @@
   <v-expansion-panel class="my-0">
     <v-expansion-panel-header disable-icon-rotate>
       <v-row align="center">
-        <v-col class="col-12 col-lg-2">
-          {{ dateupdate(todo.created_at) }}
+        <v-col class="col-12 col-lg-2 text-left">
+          {{ dateupdate(todo.created_at) }} <br />
+          <span class="text--secondary">{{ timeUpdate(todo.created_at) }}</span>
         </v-col>
         <v-col class="col-12 col-lg-2 text-center">
           {{ todo.sp }} <br />
@@ -61,7 +62,7 @@
           width="150"
           class="ma-2 mr-auto"
           color="red"
-          v-if="IsMaster !== 1"
+          v-if="IsMaster == 0"
           dark
           @click.prevent="$emit('del-todo', [todo.id, count])"
         >
@@ -72,7 +73,7 @@
           height="35"
           class="ma-2 ml-auto"
           width="150"
-          v-if="todo.status == 2 && IsMaster == 1"
+          v-if="todo.status == 2 && IsMaster > 0"
           color="green"
           dark
           @click.prevent="$emit('finish-todo', [todo.id, count])"
@@ -83,7 +84,7 @@
         <v-btn
           height="35"
           width="150"
-          v-if="todo.status == 1 && IsMaster == 1"
+          v-if="todo.status == 1 && IsMaster > 0"
           class="ma-2 ml-auto"
           color="#23539c"
           dark
@@ -138,6 +139,10 @@ export default {
         "." +
         dateFormat(todo, "yy")
       );
+    },
+    timeUpdate(todo) {
+      // var dateFormat = require("dateformat");
+      return dateFormat(todo, "HH:MM:ss");
     },
   },
 };
