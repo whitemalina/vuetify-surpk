@@ -14,8 +14,20 @@
           {{ todo.text }}
         </v-col>
         <v-col class="text-center col-12 col-lg-3">
-          {{ todo.user }}
+          <v-tooltip key="106" v-if="checkContact(todo.contact)" bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <span v-bind="attrs" v-on="on" class="caption">
+                {{ todo.user }}
+              </span>
+            </template>
+            <span>{{ todo.contact }}</span>
+          </v-tooltip>
+          <span v-if="!checkContact(todo.contact)" class="caption">{{
+            todo.user
+          }}</span>
+
           <br />
+
           <span class="caption">{{ todo.master }}</span>
         </v-col>
       </v-row>
@@ -117,6 +129,7 @@ export default {
       user: "",
       text: "",
       status: "",
+      contact: null,
     },
     count: null,
   },
@@ -124,6 +137,14 @@ export default {
     this.UserIsAdmin();
   },
   methods: {
+    checkContact(contact) {
+      console.log(contact);
+      if (typeof contact != "undefined" && contact !== null) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     UserIsAdmin() {
       let user = JSON.parse(localStorage.getItem("user"));
       this.IsAdmin = user.IsAdmin;
